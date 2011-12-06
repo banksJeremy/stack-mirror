@@ -12,8 +12,10 @@ from lxml import etree
 
 is_numeric = re.compile(r"^[\-\+]?\d+(\.\d+)?([eE][+\-]\d+(\.\d+)?)?$").match
 
-# used Hex Fiend to strip all "&#x00;" from the file.
-# and all "&#x0A;"
+def slug(s):
+    return re.sub(r"(^(|(?<=\-))\-|\-+$)*", "",
+                 re.sub(r"[^a-z0-9]+", "-",
+                        s.lower()))
 
 def _iter_rows_of_xml(f):
     parseEvents = etree.iterparse(f, ["start"])
@@ -21,6 +23,10 @@ def _iter_rows_of_xml(f):
     
     for _, element in parseEvents:
         yield element
+        
+        element.clear() # don't hold in memory
+        while element.getprevious() is not None:
+            del element.getparent()[0]
 
 def affinities_by_name(name, cache={}):
     try:
