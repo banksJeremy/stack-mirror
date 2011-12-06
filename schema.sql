@@ -196,5 +196,8 @@ CREATE TABLE IF NOT EXISTS Votes (
     LastSnapshotName      TEXT    NOT NULL     REFERENCES Snapshots,
     DeletionSnapshotName  TEXT                 REFERENCES Snapshots,
     VoteTypeID            INTEGER              REFERENCES VoteTypes,
-    Name                  TEXT    NOT NULL    
+    PostId                INTEGER              REFERENCES Posts,
+    Name                  TEXT    NOT NULL,
+    CreationDate          NUMERIC,
+    BountyAmong           INTEGER
 );

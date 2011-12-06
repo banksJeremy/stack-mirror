@@ -72,7 +72,8 @@ def import_(db, *dumps):
                     i += 1
                     
                     if i % 10000 == 0:
-                        logger.info("At " + table + "[" + str(i) + "]" + " - " + str(competion) + " Completion - Id " + str(attributes.get("Id")) + ".")
+                        logger.info("Committing {0}@{1}[{2}; {3:.1f}%]"
+                                    .format(table, snapshot_name, i, competion * 100))
                         db.commit()
                     
                     # If it doesn't have an Id, it's not a row or we don't want it.
@@ -86,15 +87,20 @@ def import_(db, *dumps):
                     if previous and previous[0] > snapshot_name:
                         continue
                     
-                    for key, value in items:
-                        if key.endwith("Date"):
-                            groups = re.match(r"^(\d+)-(\d+)-(\d+)T(\d+):(\d+)(\.\d+)$", value).groups()
+                    for key, value in attributes.items():
+                        if key.endswith("Date"):
+                            match = re.match(r"^(\d{4})-(\d{2})-(\d{2})(T(\d{2}):(\d{2}):(\d+)(\.\d+)?)?$", value)
+                            
+                            if not match:
+                                logger.error("Unrecognized date format: " + repr(value))
+                                break
+                            
+                            groups = match.groups()
                             value = (datetime.datetime(int(groups[0]), int(groups[1]), int(groups[2]),
-                                                       int(groups[3]), int(groups[4]), int(groups[5]),
-                                                       int(float("0" + groups[6]) * 1))
+                                                       int(groups[4] or "0"), int(groups[5] or "0"), int(groups[6] or "0"),
+                                                       int(float("0" + (groups[7] or "0")) * 1))
                                      - datetime.datetime(1970, 1, 1)).total_seconds()
-                            print value
-                            items[key] = value
+                            attributes[key] = value
                      
                     keys = list(attributes.keys())
                     values = [attributes.get(key) for key in keys]
@@ -109,6 +115,9 @@ def import_(db, *dumps):
                            ")")
                     cursor.execute(sql, values)
                 
+                logger.info("Table complete.")
+                db.commit()
+                
                 logger.info("Marking deleted rows.")
                 sql = ("""UPDATE """ + quote_identifier(table) + """
                              SET DeletionSnapshotName = ?
@@ -116,6 +125,8 @@ def import_(db, *dumps):
                              AND (DeletionSnapshotName = NULL
                                    OR DeletionSnapshotName > ?)""")
                 cursor.execute(sql, [snapshot_name, snapshot_name, snapshot_name])
+                
+                # TODO: handle undeletion as well
 
 def _rel(path):
     return os.path.normpath(os.path.join(os.path.dirname(sys.argv[0]), path))
