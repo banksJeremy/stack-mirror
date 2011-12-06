@@ -46,10 +46,13 @@ def import_(db, *dumps):
     for dump_root in dumps:
         snapshot_name = os.path.basename(dump_root)
         
+        if not snapshot_name:
+            raise ValueError("specify a directory name, no trailing slash")
+        
         with db:
             db.execute("INSERT OR IGNORE INTO Snapshots (Name) VALUES (?)", [snapshot_name])
         
-        logger.info("Loading dump " + dump_root + ".")
+        logger.info("Loading dump " + snapshot_name + ".")
         for table in DUMP_TABLES:
             filename = os.path.join(dump_root, table + ".xml")
             if not os.path.exists(filename):
@@ -60,30 +63,59 @@ def import_(db, *dumps):
             i = 0
             
             with db:
-                for tag, attributes in _iter_xml(filename):
+                cursor = db.cursor()
+                
+                for tag, attributes, competion in _iter_xml(filename):
+                    if i == 1:
+                        logger.debug(str(tag) + " " + str(attributes))
+                    
                     i += 1
                     
+                    if i % 10000 == 0:
+                        logger.info("At " + table + "[" + str(i) + "]" + " - " + str(competion) + " Completion - Id " + str(attributes.get("Id")) + ".")
+                        db.commit()
+                    
                     # If it doesn't have an Id, it's not a row or we don't want it.
-                    if attributes.get("Id") is None:
+                    id_ = attributes.get("Id")
+                    if id_ is None:
                         continue
                     
+                    cursor.execute("SELECT LastSnapshotName FROM " + quote_identifier(table) + " WHERE Id = ?", [id_])
+                    previous = cursor.fetchone()
+                    
+                    if previous and previous[0] > snapshot_name:
+                        continue
+                    
+                    for key, value in items:
+                        if key.endwith("Date"):
+                            groups = re.match(r"^(\d+)-(\d+)-(\d+)T(\d+):(\d+)(\.\d+)$", value).groups()
+                            value = (datetime.datetime(int(groups[0]), int(groups[1]), int(groups[2]),
+                                                       int(groups[3]), int(groups[4]), int(groups[5]),
+                                                       int(float("0" + groups[6]) * 1))
+                                     - datetime.datetime(1970, 1, 1)).total_seconds()
+                            print value
+                            items[key] = value
+                     
                     keys = list(attributes.keys())
                     values = [attributes.get(key) for key in keys]
                     
                     keys.append("LastSnapshotName")
                     values.append(snapshot_name)
                     
-                    if i % 10000 == 0:
-                        logger.info("At " + table + "/Id " + attributes.grater("Id") + "...")
-                    
-                    # todo: make sure existing value doesn't have a grater snapshot_name
-                    
                     sql = ("INSERT OR REPLACE INTO " + quote_identifier(table) + "(" +
                            ", ".join(quote_identifier(key) for key in keys) +
                            ") VALUES (" +
                            ", ".join("?" for key in keys) +
                            ")")
-                    db.execute(sql, values)
+                    cursor.execute(sql, values)
+                
+                logger.info("Marking deleted rows.")
+                sql = ("""UPDATE """ + quote_identifier(table) + """
+                             SET DeletionSnapshotName = ?
+                           WHERE LastSnapshotName < ?
+                             AND (DeletionSnapshotName = NULL
+                                   OR DeletionSnapshotName > ?)""")
+                cursor.execute(sql, [snapshot_name, snapshot_name, snapshot_name])
 
 def _rel(path):
     return os.path.normpath(os.path.join(os.path.dirname(sys.argv[0]), path))
@@ -100,11 +132,15 @@ def _iter_xml(filename):
     parser = etree.XMLParser(recover=True, target=queue)
     done = False
     
+    bytes_total = os.path.getsize(filename)
+    bytes_read = 0
+    
     with open(filename) as f:
         while not done:
             while not queue:
                 data = f.read(4096)
                 if data:
+                    bytes_read += len(data)
                     parser.feed(data)
                 else:
                     parser.close()
@@ -112,7 +148,7 @@ def _iter_xml(filename):
                     break
             
             while queue:
-                yield queue.pop()
+                yield queue.pop() + (bytes_read * 1.0 / bytes_total ,)
           
 def quote_identifier(s, errors="strict"):
     # Quotes a SQLite identifier. Source: http://stackoverflow.com/a/6701665

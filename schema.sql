@@ -1,4 +1,4 @@
-PRAGMA foreign_keys = ON;
+PRAGMA foreign_keys = OFF;
 
 CREATE TABLE IF NOT EXISTS Snapshots (
     Name                  TEXT PRIMARY KEY --- precedence is determined by binary sort order.
@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS Users (
     Id                    INTEGER PRIMARY KEY,
     LastSnapshotName      TEXT    NOT NULL     REFERENCES Snapshots,
     DeletionSnapshotName  TEXT                 REFERENCES Snapshots,
-    Reputation            INTEGER,
+    Reputation            INTEGER NOT NULL,
     CreationDate          NUMERIC,
     DisplayName           TEXT,
     LastAccessDate        NUMERIC,
@@ -195,5 +195,6 @@ CREATE TABLE IF NOT EXISTS Votes (
     Id                    INTEGER PRIMARY KEY,
     LastSnapshotName      TEXT    NOT NULL     REFERENCES Snapshots,
     DeletionSnapshotName  TEXT                 REFERENCES Snapshots,
+    VoteTypeID            INTEGER              REFERENCES VoteTypes,
     Name                  TEXT    NOT NULL    
 );
