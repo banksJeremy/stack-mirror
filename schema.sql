@@ -37,6 +37,8 @@ INSERT OR IGNORE INTO Users (  Id, LastSnapshotId,    DisplayName, CreationDate)
 INSERT OR IGNORE INTO Users (  Id, LastSnapshotId,    DisplayName, CreationDate)
                      VALUES (1114,     "~preload", "Jeremy Banks",   1218545682);
 
+--- Early dumps don't include the Id for badges. Since badges are practically never deleted,
+--- we'll just discard these records.
 CREATE TABLE IF NOT EXISTS Badges (
     Id                    INTEGER PRIMARY KEY,
     LastSnapshotId        TEXT    NOT NULL     REFERENCES Snapshots,
@@ -45,9 +47,6 @@ CREATE TABLE IF NOT EXISTS Badges (
     Name                  TEXT    NOT NULL,
     Date                  NUMERIC
 );
-
-INSERT OR IGNORE INTO Badges (  Id, LastSnapshotId,    DisplayName, CreationDate)
-                      VALUES (1114,     "~preload", "Jeremy Banks",   1218545682);
 
 
 CREATE TABLE IF NOT EXISTS PostTypes (
@@ -168,36 +167,6 @@ CREATE TABLE IF NOT EXISTS PostHistory (
     Text                  TEXT
 );
 
-CREATE TABLE IF NOT EXISTS Tags (
-    Id                    INTEGER PRIMARY KEY,
-    LastSnapshotId        TEXT    NOT NULL     REFERENCES Snapshots,
-    DeletionSnapshotId    TEXT                 REFERENCES Snapshots,
-    Count                 INTEGER
-);
-
---  because this has no index, 
-CREATE TABLE IF NOT EXISTS PostTags (
-    LastSnapshotId        TEXT    NOT NULL     REFERENCES Snapshots,
-    DeletionSnapshotId    TEXT                 REFERENCES Snapshots,
-    PostId                INTEGER NOT NULL     REFERENCES Posts,
-    TagId                 INTEGER NOT NULL     REFERENCES Tags
-);
-
-CREATE TABLE IF NOT EXISTS TagSynonyms (
-    Id                    INTEGER PRIMARY KEY,
-    LastSnapshotId        TEXT    NOT NULL     REFERENCES Snapshots,
-    DeletionSnapshotId    TEXT                 REFERENCES Snapshots,
-    SourceTagName         TEXT,
-    TargetTagName         TEXT,
-    CreationDate          NUMERIC,
-    OwnerUserId           INTEGER,
-    AutoRenameCount       INTEGER,
-    LastAutoRename        NUMERIC,
-    Score                 INTEGER,
-    ApprovedByUserId      INTEGER              REFERENCES Users,
-    ApprovalDate          NUMERIC
-);
-
 CREATE TABLE IF NOT EXISTS VoteTypes (
     Id                    INTEGER PRIMARY KEY,
     LastSnapshotId        TEXT    NOT NULL     REFERENCES Snapshots,
@@ -226,29 +195,4 @@ CREATE TABLE IF NOT EXISTS Votes (
     LastSnapshotId        TEXT    NOT NULL     REFERENCES Snapshots,
     DeletionSnapshotId    TEXT                 REFERENCES Snapshots,
     Name                  TEXT    NOT NULL    
-);
-
-CREATE TABLE IF NOT EXISTS SuggestedEdits (
-    Id                    INTEGER PRIMARY KEY,
-    LastSnapshotId        TEXT    NOT NULL     REFERENCES Snapshots,
-    DeletionSnapshotId    TEXT                 REFERENCES Snapshots,
-    CreationDate          NUMERIC,
-    ApprovalDate          NUMERIC,
-    RejectionDate         NUMERIC,
-    OwnerUserId           INTEGER              REFERENCES Users,
-    Comment               TEXT,
-    Title                 TEXT,
-    Tags                  TEXT,
-    RevisionGUID          TEXT
-);
-
-CREATE TABLE IF NOT EXISTS SuggestedEditVotes (
-    Id                    INTEGER PRIMARY KEY,
-    LastSnapshotId        TEXT    NOT NULL     REFERENCES Snapshots,
-    DeletionSnapshotId    TEXT                 REFERENCES Snapshots,
-    UserId                INTEGER              REFERENCES Users,
-    VoteTypeId            INTEGER              REFERENCES VoteTypes,
-    CreationDate          NUMERIC,
-    TargetUserId          INTEGER              REFERENCES Users,
-    TargetRepChange       INTEGER
 );
