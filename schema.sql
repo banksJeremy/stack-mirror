@@ -1,4 +1,10 @@
-PRAGMA foreign_keys = OFF;
+PRAGMA foreign_keys = OFF; -- data has integrity issues, maybe handle later?
+
+-- from http://stackoverflow.com/a/6533930
+PRAGMA page_size = 4096;
+PRAGMA locking_mode=EXCLUSIVE;
+PRAGMA synchronous=NORMAL;
+PRAGMA journal_mode=WAL;
 
 CREATE TABLE IF NOT EXISTS Snapshots (
     Name                  TEXT PRIMARY KEY --- precedence is determined by binary sort order.
@@ -197,7 +203,7 @@ CREATE TABLE IF NOT EXISTS Votes (
     DeletionSnapshotName  TEXT                 REFERENCES Snapshots,
     VoteTypeID            INTEGER              REFERENCES VoteTypes,
     PostId                INTEGER              REFERENCES Posts,
-    Name                  TEXT    NOT NULL,
+    UserId                INTEGER              REFERENCES UserId,
     CreationDate          NUMERIC,
-    BountyAmong           INTEGER
+    BountyAmount          INTEGER
 );

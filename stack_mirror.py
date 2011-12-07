@@ -1,4 +1,4 @@
-#!bin/python2.7
+#!/usr/bin/env python2.7
 from collections import defaultdict, OrderedDict, deque
 from glob import glob
 from lxml import etree

@@ -1,6 +1,5 @@
 # so.wut.ca: an unofficial Stack Overflow mirror indexing deleted questions
 
-
     ./so_mirror.py import data.sqlite dumps/so-2009-04...
 
 Loads the dump into the database, using the directory's basename as the revision id.
@@ -16,9 +15,6 @@ posts, in pages of 50, sorted by score. Non-deleted posts are available through
 direct links, but they'll canonically point to the Stack Overflow post.
 
 Question URLs should be the same as Stack Overflow's and include the URL slug.
-
-parser = etree.XMLParser(recover=True)
-parseEvents = etree.iterparse("<foo>Hello &#00; World</foo>", parser=parser)
 
 Brainstorming for the future:
 Later: pull in live data through the API. How? Who knows? Maybe whenever potentially-
