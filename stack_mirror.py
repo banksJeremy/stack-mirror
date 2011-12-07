@@ -10,6 +10,7 @@ import re
 import sqlite3
 import sqlite3
 import sys
+import BaseHTTPServer
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -22,7 +23,7 @@ def main(command_name, db_name, *args):
     command = {
         "update": None,
         "import": import_,
-        "serve": None
+        "serve": serve
     }[command_name]
     
     db = sqlite3.connect(db_name)
@@ -41,6 +42,18 @@ DUMP_TABLES = [
     "posthistory",
     "votes"
 ]
+
+from bottle import route, run
+
+def serve(db):
+    @route("/")
+    def index():
+        with db:
+            cursor = db.cursor()
+            cursor.execute("SELECT * FROM Posts ORDER BY Id ASC LIMIT 100")
+            return "<br>".join(str(row) for row in cursor)
+    
+    run(host="", port=8080)
 
 def import_(db, *dumps):
     for dump_root in dumps:
@@ -160,7 +173,7 @@ def _iter_xml(filename):
             
             while queue:
                 yield queue.pop() + (bytes_read * 1.0 / bytes_total ,)
-          
+
 def quote_identifier(s, errors="strict"):
     # Quotes a SQLite identifier. Source: http://stackoverflow.com/a/6701665
     encodable = s.encode("utf-8", errors).decode("utf-8")

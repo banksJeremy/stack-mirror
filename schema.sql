@@ -29,6 +29,8 @@ CREATE TABLE IF NOT EXISTS Users (
     EmailHash             TEXT,
     Age                   INTEGER
 );
+CREATE INDEX IF NOT EXISTS idx_UserDeletion on Users (DeletionSnapshotName);
+CREATE INDEX IF NOT EXISTS idx_UserDisplayName on Users (DisplayName);
 
 INSERT OR IGNORE INTO Users (  Id, LastSnapshotName,    DisplayName, CreationDate)
                      VALUES (  -1,     "~preload",    "Community",   1217462400);
@@ -53,7 +55,6 @@ CREATE TABLE IF NOT EXISTS Badges (
     Name                  TEXT    NOT NULL,
     Date                  NUMERIC
 );
-
 
 CREATE TABLE IF NOT EXISTS PostTypes (
     Id                    INTEGER PRIMARY KEY,
@@ -94,6 +95,11 @@ CREATE TABLE IF NOT EXISTS Posts (
     ClosedDate            NUMERIC,
     CommunityOwnedDate    NUMERIC
 );
+CREATE INDEX IF NOT EXISTS idx_PostUser on Posts (OwnerUserId);
+CREATE INDEX IF NOT EXISTS idx_PostParent on Posts (ParentId);
+CREATE INDEX IF NOT EXISTS idx_PostScore on Posts (Score);
+CREATE INDEX IF NOT EXISTS idx_PostDeletion on Posts (DeletionSnapshotName);
+CREATE INDEX IF NOT EXISTS idx_PostUserIdAndDeletion on Posts (OwnerUserId, DeletionSnapshotName);
 
 CREATE TABLE IF NOT EXISTS Comments (
     Id                    INTEGER PRIMARY KEY,
@@ -105,14 +111,14 @@ CREATE TABLE IF NOT EXISTS Comments (
     CreationDate          NUMERIC,
     UserDisplayName       TEXT,
     UserId                INTEGER REFERENCES Users
-    
 );
+CREATE INDEX IF NOT EXISTS idx_UserCommentDeletion on Comments (DeletionSnapshotName);
 
 CREATE TABLE IF NOT EXISTS PostHistoryTypes (
     Id                    INTEGER PRIMARY KEY,
     LastSnapshotName      TEXT    NOT NULL     REFERENCES Snapshots,
     DeletionSnapshotName  TEXT                 REFERENCES Snapshots,
-    Name                  TEXT NOT NULL
+    Name                  TEXT    NOT NULL
 );
 
 INSERT OR IGNORE INTO PostHistoryTypes (Id, LastSnapshotName, Name) VALUES ( 1, "~preload", "Initial Title");
@@ -149,7 +155,7 @@ INSERT OR IGNORE INTO PostHistoryTypes (Id, LastSnapshotName, Name) VALUES (30, 
 CREATE TABLE IF NOT EXISTS CloseReasons (
     Id                    INTEGER PRIMARY KEY,
     LastSnapshotName      TEXT    NOT NULL     REFERENCES Snapshots,
-    Name                  TEXT NOT NULL
+    Name                  TEXT    NOT NULL
 );
 
 INSERT OR IGNORE INTO CloseReasons (Id, LastSnapshotName, Name) VALUES ( 1, "~preload", "Exact Duplicate");
@@ -173,6 +179,8 @@ CREATE TABLE IF NOT EXISTS PostHistory (
     CloseReasonId         INTEGER              REFERENCES CloseReasons,
     Text                  TEXT
 );
+CREATE INDEX IF NOT EXISTS idx_PostHistoryUserId on PostHistory (UserId);
+CREATE INDEX IF NOT EXISTS idx_PostHistoryGUID on PostHistory (RevisionGUID);
 
 CREATE TABLE IF NOT EXISTS VoteTypes (
     Id                    INTEGER PRIMARY KEY,
@@ -207,3 +215,5 @@ CREATE TABLE IF NOT EXISTS Votes (
     CreationDate          NUMERIC,
     BountyAmount          INTEGER
 );
+
+CREATE INDEX IF NOT EXISTS idx_VoteUsers on Votes (UserId);
