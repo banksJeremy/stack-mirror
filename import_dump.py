@@ -19,13 +19,12 @@ def main(command_name, db_name, *args):
     
     command = {
         "update": None,
-        "import": import_,
-        "serve": serve
+        "import": import_
     }[command_name]
     
     db = sqlite3.connect(db_name)
     logger.info("Connected to SQLite database " + db_name + ".")
-    db.executescript(schema)
+    db.executescript(INITIALIZE_IMPORT_SQL)
     logger.info("Initialized database as necessary.")
     return command(db, *args)
 
@@ -168,9 +167,9 @@ def quote_identifier(s, errors="strict"):
 
 INITIALIZE_IMPORT_SQL = """
 PRAGMA page_size = 4096;
-PRAGMA locking_mode=EXCLUSIVE;
-PRAGMA synchronous=NORMAL;
-PRAGMA journal_mode=WAL;
+--PRAGMA locking_mode=EXCLUSIVE;
+--PRAGMA synchronous=NORMAL;
+--PRAGMA journal_mode=WAL;
 
 CREATE TABLE IF NOT EXISTS Snapshots (
     Name                  TEXT PRIMARY KEY
@@ -365,6 +364,7 @@ PRAGMA journal_mode=DELETE;
 PRAGMA locking_mode=NORMAL;
 VACCUM;
 """
+
 
 if __name__ == "__main__":
     sys.exit(main(*sys.argv[1:]))

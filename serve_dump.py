@@ -40,7 +40,6 @@ def serve(db, port):
     @route("/a/<post_id:int>")
     def to_post(post_id, referrer=None):
         pass
-        
     
     @route("/questions/<question_id:int>/<slug>")
     @view("views/question")
