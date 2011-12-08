@@ -17,26 +17,45 @@ Later: pull in live data through the API. How? Who knows? Maybe whenever potenti
 stale data is requested we could send a "Refresh: 10" header and look for updates.
 Include some data in the source tree: maybe every question that Joel, Jeff or I posted to, and all of the associated users/tags.
 
-## Database 
 
-When `./so_mirror.py import` creates a new database...
+Idea: hook all links. If local, then make it an ajax request but send an out-of-band way to observe SQL queries before the page loads, then replace the loaded URL.
 
-    PRAGMA page_size = 4096;
+Eventually aggregate everything.
 
-When `./so_mirror.py import` starts importing data...
+or at least just do the normal thing and put it in the page
 
-    PRAGMA synchronous=NORMAL;
-    PRAGMA journal_mode=WAL;
-    PRAGMA locking_mode=EXCLUSIVE;
 
-When `./so_mirror.py import` finishes importing data...
+`so.wut.ca` - `questions` - `users`<sub>`1114`</sub> - 
 
-    PRAGMA synchronous=FULL;
-    PRAGMA journal_mode=DELETE;
-    PRAGMA locking_mode=NORMAL;
-    VACCUM;
+include information about indexes -- on-demand? no, when the data as a whole is requested.
+make an expiring (fixed-size, rather) dictionary to hold these logs.
 
-When `so_mirror` opens a database...
+    class LoggingQuerier(object):
+        Query = namedtuple(""LoggingQuerier.Query, "query, analysis, time")
+        
+        def __init__(self, db):
+            self.queries = []
+        
+        def text_report(self):
+            pass
+    
+    class LoggingQuerierCursor(object):
+        def __init__(self, db, querier):
+            self.db = db
+            self.querier = querier
+            self.cursor = db.cursor()
+        
+        __exit__
+            commit or rollback
+        
+        def execute(self, query, *params):
+            
+            EXPLAIN it, then time it while you run it.
+        
+        def __iter__(self):
+            return iter(self.cursor)
 
-    INDEX ALL THE COLUMNS
+logging_querier.query("")
+include a last and a first generation that it existed, and properly handle undeletion.
 
+annotate *answers* as "deleted" when they were deleted before their post was.

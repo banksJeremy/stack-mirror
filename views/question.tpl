@@ -12,11 +12,11 @@
       
       <div class="col">
         <div class="body">
-          {{question["body"]}}
+          {{!question["body"]}}
         </div>
         
         <div class="attribution">
-          asked by <a href="http://stackoverflow.com/users/224/vzczc">Some User<img src="http://www.gravatar.com/avatar/1887903198095d29f1bb9624898e9bc5?s=32" /></a>  <br>
+          <a href="">asked</a> by <a href="http://stackoverflow.com/users/224/vzczc">Some User<img src="http://www.gravatar.com/avatar/1887903198095d29f1bb9624898e9bc5?s=32" /></a>  <br>
           on August 15th, 2008<br>
           at 22:17 UTC
         </div>
@@ -52,7 +52,7 @@
     </h2>
     
     % for answer in answers:
-      <div class="answer post" id="12833">
+      <div class="answer post" id="{{answer["post_id"]}}">
         <div class="score">
           <span class="value">{{answer["score"]}}</span>
           <span class="unit">votes</span>
@@ -62,12 +62,12 @@
       
         <div class="col">
           <div class="body">
-            {{answer["body"]}}
+            {{!answer["body"]}}
           </div>
         
         
           <div class="attribution">
-            answered by <a href="http://stackoverflow.com/users/1318/jacobko">jacobko<img src="http://www.gravatar.com/avatar/86ed1705aaba3586de55f6a7690aabae?s=32" /></a>  <br>
+            <a href="#{{answer["post_id"]}}">answered</a> by <a href="http://stackoverflow.com/users/1318/jacobko">jacobko<img src="http://www.gravatar.com/avatar/86ed1705aaba3586de55f6a7690aabae?s=32" /></a>  <br>
             on August 15, 2008<br>
             at 22:22 UTC<br>
           </div>
