@@ -1,4 +1,4 @@
-# so.wut.ca: an unofficial Stack Overflow mirror indexing deleted questions
+# [so.wut.ca](http://so.wut.ca/): an unofficial Stack Overflow mirror indexing deleted questions
 
     ./import_dump.py data.sqlite dumps/so-2009-*
 
