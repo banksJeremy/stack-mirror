@@ -1,0 +1,176 @@
+html {
+  background: #D8D8D8;
+}
+
+body {
+  font: 14px sans-serif;
+}
+
+a, a:visited {
+  color: #226;
+}
+
+.wrapper {
+  width: 735px;
+  margin: 1em auto;
+  background: white;
+  padding: 1em;
+}
+
+h1,h2, h3, h4 {
+  padding-bottom: .2em;
+  border-bottom: 1px solid black;
+  margin-top: 0;
+}
+
+h1 {
+  font-size: 1.6em;
+}
+h2 {
+  font-size: 1.4em;
+}
+h3 {
+  font-size: 1.2em;
+}
+
+
+h2.answers {
+  border-bottom: 1px solid black;
+}
+
+.implied-by-style {
+  display: none;
+}
+
+.source-header {
+  display: block;
+  background-color: #EEE;
+  padding: 1em 1em;
+  font-size: 1.3em;
+  font-weight: bold;
+  color: black;
+  text-align: left;
+  margin: 0.5em 0;
+  text-align: center;
+}
+
+  .source-header a, .source-header a:visited {
+    color: black;
+  }
+
+.post .score {
+  float: left;
+  text-align: center;
+  width: 58px;
+  margin: 0px 0 0;
+  padding: 5px 0;
+  border-right: 1px solid #DDD;
+}
+
+
+.post + .post {
+  
+    border-top: 1px solid #888;
+    padding-top: 1em;
+    margin-top: 1em;
+}
+
+  .post .score .value {
+    display: block;
+    font-weight: bold;
+    font-size: 1.3em;
+    margin: 3px 0 0;
+  }
+  
+  .post .score .unit {
+    display: block;
+    opacity: 0.5;
+  }
+  
+  .post .score .annotation {
+    display: block;
+    font-weight: bold;
+    font-size: 0.8em;
+    opacity: 0.75;
+    margin: 5px 0 0;
+  }
+
+.post .tags {
+  list-style-type: none;
+  padding: 0;
+  line-height: 1.75em;
+}
+
+  .post .tags li {
+    display: inline;
+    padding: .3em .5em;
+    margin: .2em;
+    border: 1px solid #888;
+    background: #F8F8F4;
+    font-size: .75em;
+  }
+    .post .tags li a {
+      color: inherit;
+      text-decoration: inherit;
+    }
+  
+  .post .body {
+    line-height: 1.3em;
+  }
+
+  .post .body p, .post .body pre {
+    margin-top: 0;
+  }
+
+.post .attribution {  
+  font-size: 11px;
+  height: 4em;
+  float: right;
+  width: 160px;
+  border: 1px solid #E8E8E4;
+  margin-left: 1em;
+  padding: 4px;
+  padding-bottom: 8px;
+  background: #F8F8F4;
+  position: relative;
+  line-height: 1.6em;
+  margin-bottom: 8px;
+}
+
+  .post .attribution img {
+    border: 1px solid #E8E8E4;
+    border-right: 0;
+    border-bottom: 0;
+    float: right;
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+  }
+
+.post .col {
+  float: right;
+  width: 665px;
+}
+
+pre {
+  background: #EEE;
+  padding: 8px 8px;
+  margin-bottom; 10px;
+  font: 100% Menlo, Monaco, Consolas, "Lucida Console", monospace;
+  line-height: 1.3em;
+  overflow-x: scroll;
+}
+
+.footer {
+  font-size: 0.8em;
+  text-align: center;
+}
+
+.footer a {
+  text-decoration: none;
+  color: #222;
+}
+
+.footer a:hover {
+  text-decoration: underline;
+}

@@ -1,22 +1,16 @@
 # so.wut.ca: an unofficial Stack Overflow mirror indexing deleted questions
 
-    ./so_mirror.py import data.sqlite dumps/so-2009-04...
+    ./import_dump.py data.sqlite dumps/so-2009-*
 
-Loads the dump into the database, using the directory's basename as the revision id.
+Loads the dump into the database, using the directory's basename as the revision id (relevant!).
 
-    ./so_mirror.py update import data.sqlite stackoverflow.com 123 414 5464 657 57
+    ./serve_dump.py date.sqlite 8080
 
-Updates the specified posts' threads using the API.
-
-    ./so_mirror.py serve data.sqlite 8080
-
-Adds all of the indexes to the database.
-
-Serve the specified database on the specified port. The index will display deleted
+Indexes the database, then serves it! The home will display deleted
 posts, in pages of 50, sorted by score. Non-deleted posts are available through
 direct links, but they'll canonically point to the Stack Overflow post.
 
-Question URLs should be the same as Stack Overflow's and include the URL slug.
+
 
 Brainstorming for the future:
 Later: pull in live data through the API. How? Who knows? Maybe whenever potentially-
