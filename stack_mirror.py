@@ -18,6 +18,26 @@ logger = logging.getLogger("stack_mirror")
 logger.setLevel(logging.INFO)
 logger.addHandler(logging.NullHandler())
 
+html_escape_table = {
+    "&": "&amp;",
+    '"': "&quot;",
+    "'": "&apos;",
+    ">": "&gt;",
+    "<": "&lt;",
+}
+
+def html_escape(text):
+    """Produce entities within text."""
+    return "".join(html_escape_table.get(c,c) for c in text)
+
+def slugged(title):
+    slug = title.lower()
+    slug = re.sub(r"[']", "", slug)
+    slug = re.sub(r"[^a-zA-Z0-9]+", "-", slug)
+    slug = re.sub(r"\-\-+", "-", slug)
+    slug = re.sub(r"(^\-|\-$|)", "", slug)
+    slug = slug[:92] # maximum length
+    return slug
 
 def main(command_name, db_name, *args):
     command = {
@@ -43,15 +63,42 @@ DUMP_TABLES = [
     "votes"
 ]
 
-from bottle import route, run
+from bottle import route, run, redirect
 
 def serve(db):
     @route("/")
     def index():
+        body = "<!doctype html><html><meta charset=\"utf-8\"><title>testing mirror index</title></head><body><ul>"
+        
         with db:
             cursor = db.cursor()
-            cursor.execute("SELECT * FROM Posts ORDER BY Id ASC LIMIT 100")
-            return "<br>".join(str(row) for row in cursor)
+            cursor.execute("SELECT Id, Title, Score FROM Posts Where PostTypeId = 1 ORDER BY Id ASC LIMIT 100")
+            
+            for post_id, title, score in cursor:
+                url = "/questions/" + slugged(post_id, title)
+                
+                body += "<li><a href=\"questions/" + str(post_id) + "/" + slugged(title) + "\">" + "[" + str(score) + "]" + html_escape(title) + "</a></li>"
+        
+        body += "</ul></body></html>"
+        
+        return body
+    
+    @route("/questions/<post_id:int>/:slug")
+    def question(post_id, slug):
+        body = ""
+        
+        with db:
+            cursor = db.cursor()
+            cursor.execute("SELECT Id, Title, Body, Score FROM Posts WHERE Id = ? OR ParentId = ?", [post_id, post_id])
+            posts = {post_id: (title, body, score) for (post_id, title, body, score) in cursor}
+        
+        title = posts[post_id][0]
+        
+        if slug != slugged(title):
+            return redirect("/questions/" + str(post_id) + "/" + slugged(title), 301)
+        
+        return posts[post_id][1]
+        
     
     run(host="", port=8080)
 
