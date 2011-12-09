@@ -97,6 +97,9 @@ def serve(db, port):
 
 def sluggify(title):
     slug = title.lower()
+    slug = slug.replace(r"\bc++\b", r"c-plus-plus")
+    slug = slug.replace(r"\bc#\b", r"c-sharp")
+    slug = slug.replace(r"\b\.net\b", r"dot-net"")
     slug = re.sub(r"[']", "", slug)
     slug = re.sub(r"[^a-zA-Z0-9]+", "-", slug)
     slug = re.sub(r"\-\-+", "-", slug)
