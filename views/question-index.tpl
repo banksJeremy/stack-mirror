@@ -1,3 +1,5 @@
+% from server import kspan, aurl
+
 <table class="questions">
   <thead>
     <th class="score">
@@ -14,19 +16,20 @@
     </th>
   <tbody>
     % alt = False
-    % for question in questions:
+    % for row in rows:
+      % print row.keys()
       <tr class="{{"alt" if alt else ""}}">
         <td class="score">
-          {{!kspan(question["score"])}}
+          {{!kspan(row["question.Score"])}}
         </td>
         <td class="views">
-          {{!kspan(question["views"])}}
+          {{!kspan(row["question.ViewCount"])}}
         </td>
         <td class="title">
-          <a href="{{question["url"]}}">{{question["title"]}}</a>
+          <a href="{{aurl("questions", row["question.Id"], row["question.Title"])}}">{{row["question.Title"]}}</a>
         </td>
         <td class="creator">
-          <a href="/users/{{question["creator_id"]}}">{{question["creator_name"]}}</a>
+          <a href="{{aurl("users", row["owner.Id"], row["owner.DisplayName"])}}">{{row["owner.DisplayName"]}}</a>
         </td>
       </tr>
       % alt = not alt

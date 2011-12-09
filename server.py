@@ -16,6 +16,8 @@ STACK_KEY = "22lRWuqxMUOpCjzj9_4rLA"
 AMAZON_TAG = "whk5jwcq-20"
 
 def serve(db, port):
+    db.row_factory = sqlite3.Row
+    
     from bottle import route, view, request, run, static_file, redirect, error, abort, template
     
     @route("/")
@@ -24,27 +26,56 @@ def serve(db, port):
     
     @route("/questions")
     @view("views/question-index")
-    def questions_index():
-        logger.info("Loading index.")
-        questions = []
-        
+    def question_index():
         with db:
             cursor = db.cursor()
-            cursor.execute("""SELECT p.Id, p.Title, p.Score, p.ViewCount, u.DisplayName, u.Id
-                                FROM Posts p LEFT JOIN Users u ON p.OwnerUserId = u.Id Where PostTypeId = 1 ORDER BY Score DESC LIMIT 1000""")
-            
-            for post_id, title, score, views, creator_name, creator_id in cursor:
-                questions.append({
-                    "views": views,
-                    "creator_name": creator_name,
-                    "creator_id": creator_id,
-                    "creator_url": "/users/{0}/{1}".format(creator_id, sluggify(creator_name)),
-                    "score": score,
-                    "title": title,
-                    "url": "/questions/{0}/{1}".format(post_id, sluggify(title))})
-        
-        logger.info("Rendering index.")
-        return {"questions": questions, "kspan": kspan }
+            cursor.execute("""
+                SELECT question.Id, question.Title, question.Score, question.ViewCount, question.DeletionSnapshotName,
+                       owner.DisplayName as OwnerDisplayName
+                FROM Posts question
+                LEFT JOIN PostTypes type ON question.PostTypeId = type.Id
+                LEFT JOIN Users owner ON question.OwnerUserId = owner.Id
+                WHERE type.Name = "Question"
+                ORDER BY Score DESC LIMIT 1000
+            """)
+            return { "rows": list(cursor) }
+    
+    @route("/answers")
+    @view("views/answer-index")
+    def answer_index():
+        with db:
+            cursor = db.cursor()
+            cursor.execute("""
+                SELECT answer.Id, answer.Score, answer.DeletionSnapshotName,
+                       owner.DisplayName, owner.Id, owner.DeletionSnapshotName
+                       question.Id, question.Title, question.ViewCount, question.AcceptedAnswerId
+                FROM Posts answer
+                JOIN Posts question ON answer.ParentId = question.Id
+                LEFT JOIN PostTypes type ON answer.PostTypeId = type.Id
+                LEFT JOIN Users owner ON answer.OwnerUserId = owner.Id
+                WHERE type.Name = "Answer"
+                ORDER BY Score DESC LIMIT 1000
+            """)
+            return { "rows": list(cursor) }
+    
+    @route("/others")
+    @view("views/other-index")
+    def answer_index():
+        with db:
+            cursor = db.cursor()
+            cursor.execute("""
+                SELECT post.Id, post.Title, post.Score, post.Body, post.DeletionSnapshotName,
+                       parent.Id, parent.Title, parent.Score, parent.Body, parent.DeletionSnapshotName,
+                       owner.DisplayName, owner.Id,
+                       type.Id, type.Name
+                FROM Posts post
+                JOIN Posts parent ON post.ParentId = parent.Id
+                LEFT JOIN PostTypes type ON post.PostTypeId = type.Id
+                LEFT JOIN Users owner ON post.OwnerUserId = owner.Id
+                WHERE type.Name != "Question" AND type.Name != "Answer"
+                ORDER BY Score DESC LIMIT 1000
+            """)
+            return { "rows": list(cursor) }
     
     @route("/<post_id:int>")
     @route("/q/<post_id:int>")
@@ -65,11 +96,11 @@ def serve(db, port):
                 WHERE p.Id = ?""", [post_id])
             for post_type, post_id, post_title, parent_id, parent_title in cursor:
                 if post_type == "Question":
-                    return redirect("/questions/{0}/{1}".format(post_id, sluggify(post_title)))
+                    return redirect(aurl("questions", post_id, post_title))
                 elif post_type == "Answer":
-                    return redirect("/questions/{0}/{1}#{2}".format(parent_id, sluggify(parent_title), post_id))
+                    return redirect(aurl("questions", post_id, post_title) + "#" + unicode(post_id))
                 else:
-                    return redirect("/others/{0}".format(post_id))
+                    return redirect(aurl("others", post_id))
                 
                 # return redirect()
             else:
@@ -107,8 +138,7 @@ def serve(db, port):
         proper_slug = sluggify(question["title"])
         
         if slug != proper_slug:
-            logger.info("Redirecting user from slug {0!r} to {1!r}.".format(slug, proper_slug))
-            return redirect("/questions/{0}/{1}".format(question_id, proper_slug), 301)
+            return redirect(aurl("questions", question_id, question["title"]), 301)
         
         return {
             "question": question,
@@ -142,9 +172,15 @@ def kspan(n):
     else:
       return '<span title="{0}" data-value="{0}" class="value">{0}</span>'.format(n)
 
+def aurl(*components):
+    return "/" + "/".join(sluggify(unicode(component)) for component in components)
+
 def sluggify(title):
     slug = title or ""
     slug = slug.lower()
+    slug = re.sub(r"\bc\+\+\b", r"c-plus-plus", slug)
+    slug = re.sub(r"\bc#(?!\w)", r"c-sharp", slug)
+    slug = re.sub(r"\b\.net\b", r"dot-net", slug)
     slug = re.sub(r"[']", "", slug)
     slug = re.sub(r"[^a-zA-Z0-9]+", "-", slug)
     slug = re.sub(r"\-\-+", "-", slug)
@@ -187,6 +223,7 @@ INDEX_INITIALIZATION_SQLS = [
     "CREATE INDEX IF NOT EXISTS idx_PostHistory3 ON PostHistory (PostHistoryTypeId, Comment);",
     "CREATE INDEX IF NOT EXISTS idx_Votes1 ON Votes (VoteTypeID, DeletionSnapshotName, UserId);",
     "CREATE INDEX IF NOT EXISTS idx_Votes1 ON Votes (PostId, DeletionSnapshotName);",
+    "PRAGMA full_column_names=OFF;",
     # "ANALYZE;",
     # "VACUUM;"
 ]

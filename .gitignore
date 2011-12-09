@@ -5,4 +5,5 @@ lib/
 .Python
 *.sqlite
 *.sqlite-*
-
+*.pyc
+*.swp
