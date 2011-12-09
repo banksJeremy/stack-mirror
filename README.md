@@ -64,3 +64,7 @@ I should markup the links to Stack Overflow with like a different color.
 
 Being forced to link to the user's original profile is irritating.
 
+
+
+
+Add a generic link-rewriting mechanism. Use this to rewrite Amazon links, but also to redirect any intra-SO links that we can handle ourselves.
