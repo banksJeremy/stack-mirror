@@ -29,6 +29,19 @@
     </script>
   </head>
   <body>
-    %include
+    <div class="navbar">
+      <a href="/" class="site-name">so.wut.ca</a>
+      <a href="/questions" class="active">questions</a><sub><a href="" class="active">123</a></sub>
+      <a href="/answers">answers</a>
+      <a href="/users">users</a>
+      <a href="/comments">comments</a>
+      <a href="/others">others</a>
+    </div>
+    <div class="wrapper">
+      %include
+    </div>
+    <div class="footer">
+      <a href="/">so.wut.ca: an unofficial Stack Overflow mirror indexing deleted questions</a> (<a href="https://github.com/jeremybanks/stack-mirror">source on GitHub</a>)
+    </div>
   </body>
 </html>

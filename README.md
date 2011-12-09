@@ -59,3 +59,8 @@ logging_querier.query("")
 include a last and a first generation that it existed, and properly handle undeletion.
 
 annotate *answers* as "deleted" when they were deleted before their post was.
+
+I should markup the links to Stack Overflow with like a different color.
+
+Being forced to link to the user's original profile is irritating.
+
