@@ -1,3 +1,5 @@
+You shouldn't actually READ ME. This isn't finished and this is mostly notes to myself.
+
 # [so.wut.ca](http://so.wut.ca/): an unofficial Stack Overflow mirror indexing deleted questions
 
     ./import_dump.py data.sqlite dumps/so-2009-*
@@ -23,6 +25,8 @@ Idea: hook all links. If local, then make it an ajax request but send an out-of-
 Eventually aggregate everything.
 
 or at least just do the normal thing and put it in the page
+
+Eventually, handle every conceivable URL format. For now just handle some nice ones.
 
 
 `so.wut.ca` - `questions` - `users`<sub>`1114`</sub> - 

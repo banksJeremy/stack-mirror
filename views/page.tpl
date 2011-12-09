@@ -30,7 +30,7 @@
   </head>
   <body>
     <div class="navbar">
-      <a href="/" class="site-name">so.wut.ca</a>
+      <a href="/" class="site-name">SO.wut.ca</a>
       <a href="/questions" class="active">questions</a><sub><a href="" class="active">123</a></sub>
       <a href="/answers">answers</a>
       <a href="/users">users</a>
@@ -41,7 +41,8 @@
       %include
     </div>
     <div class="footer">
-      <a href="/">so.wut.ca: an unofficial Stack Overflow mirror indexing deleted questions</a> (<a href="https://github.com/jeremybanks/stack-mirror">source on GitHub</a>)
+      <a href="/">SO.wut.ca</a> is an unofficial mirror of <a href="http://stackoverflow.com/">Stack Overflow</a> including much deleted content. The source is <a href="https://github.com/jeremybanks/stack-mirror">available on GitHub</a>.<br />
+      Posts are owned by their authors and used the terms of <a href="http://creativecommons.org/licenses/by-sa/2.5/">the CC BY-SA 2.5 license</a> and <a href="http://blog.stackoverflow.com/2009/06/attribution-required/">the Stack Exchange attribution policy</a>.
     </div>
   </body>
 </html>

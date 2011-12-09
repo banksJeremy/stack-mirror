@@ -2,10 +2,10 @@
   <h1>{{question["title"]}}</h1>
 
   <div class="score">
-    <span class="value">{{question["score"]}}</span>
+    {{!kspan(question["score"])}}
     <span class="unit">votes</span>
     <br>
-    <span class="value">{{question["views"]}}</span>
+    {{!kspan(question["views"])}}
     <span class="unit">views</span>
   </div>
   
@@ -31,23 +31,18 @@
     </p>
     
     <ul class="tags">
-      <li><a href="/tags/language-agnostic">language-agnostic</a></li>
-      <li><a href="/tags/fun">fun</a></li></li>
-      <li><a href="/tags/fun">fun</a></li></li>
-      <li><a href="/tags/fun">fun</a></li></li>
-      <li><a href="/tags/fun">fun</a></li></li>
+      % for tag in question["tags"]:
+        <li><a href="/tags/{{tag}}">{{tag}}</a></li></li>
+      % end
     </ul>
     
     <div class="controls">
-      <a href="#">link</a> | <a href="#">original</a>
+      <a href="/q/{{question["post_id"]}}">link</a> |
+      <a href="http://stackoverflow.com/q/{{question["post_id"]}}">original</a>
     </div>
   </div>
   
   <div style="clear: both;"></div>
-</div>
-
-<div class="source-header">
-  This was <a href="#">originally posted</a> on <a href="http://stackoverflow.com/">Stack Overflow</a>, but it has been deleted.
 </div>
 
 <h2 class="answers">
@@ -57,7 +52,7 @@
 % for answer in answers:
   <div class="answer post" id="{{answer["post_id"]}}">
     <div class="score">
-      <span class="value">{{answer["score"]}}</span>
+      {{!kspan(answer["score"])}}
       <span class="unit">votes</span>
     
       <span class="annotation">accepted</span>
@@ -76,7 +71,8 @@
       </div>
       
       <div class="controls">
-        <a href="#">link</a> | <a href="#">original</a>
+        <a href="/a/{{answer["post_id"]}}">link</a> |
+        <a href="http://stackoverflow.com/a/{{answer["post_id"]}}">original</a>
       </div>
     
     </div>

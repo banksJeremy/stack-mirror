@@ -192,7 +192,7 @@ h2.answers {
   height: 4em;
   float: right;
   width: 160px;
-  border: 1px solid #E8E8E4;
+  border: 1px inset #DDD; /* #E8E8E4;*/
   margin-left: 1em;
   padding: 4px;
   padding-bottom: 8px;
@@ -232,10 +232,39 @@ pre {
 }
 
 .footer a {
-  text-decoration: none;
   color: #222;
 }
 
-.footer a:hover {
-  text-decoration: underline;
+.answers {
+    margin-top: 0.5em;
+}
+
+.post:target .col {
+    border-right:  0.50em solid #D8D8D8;
+    margin-right: -1.00em;
+    padding-right: 0.50em;
+}
+
+table.questions {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table.questions .alt td {
+    background: #F8F8F8;
+}
+
+table.questions td, table.questions th {
+    text-align: right;
+    padding-left: .5em;
+    padding-bottom: .8em;
+    padding-top: .7em;
+    border-bottom: 2px solid #EEE;
+    padding-right: .5em;
+}
+
+table.questions td.title, table.questions th.title {
+    width: auto;
+    overflow: hidden;   
+    text-align: left;
 }
