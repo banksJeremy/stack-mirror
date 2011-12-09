@@ -35,4 +35,4 @@
   </table>
 </ul>
 
-%rebase page title="S.O. Mirror"
+%rebase page title="High-scoring Questions", active="questions"

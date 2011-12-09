@@ -14,30 +14,31 @@ logger.addHandler(logging.NullHandler())
 
 STACK_KEY = "22lRWuqxMUOpCjzj9_4rLA"
 AMAZON_TAG = "whk5jwcq-20"
-# 
-# class RawPost(object):
-#     def __init__(self):
-#         
 
 def serve(db, port):
     from bottle import route, view, request, run, static_file, redirect, error, abort, template
     
     @route("/")
-    @view("views/index")
-    def index():
+    def root():
+        redirect("/questions")
+    
+    @route("/questions")
+    @view("views/question-index")
+    def questions_index():
         logger.info("Loading index.")
         questions = []
         
         with db:
             cursor = db.cursor()
             cursor.execute("""SELECT p.Id, p.Title, p.Score, p.ViewCount, u.DisplayName, u.Id
-                                 FROM Posts p LEFT JOIN Users u ON p.OwnerUserId = u.Id Where PostTypeId = 1 ORDER BY Score DESC LIMIT 1000""")
+                                FROM Posts p LEFT JOIN Users u ON p.OwnerUserId = u.Id Where PostTypeId = 1 ORDER BY Score DESC LIMIT 1000""")
             
             for post_id, title, score, views, creator_name, creator_id in cursor:
                 questions.append({
                     "views": views,
                     "creator_name": creator_name,
                     "creator_id": creator_id,
+                    "creator_url": "/users/{0}/{1}".format(creator_id, sluggify(creator_name)),
                     "score": score,
                     "title": title,
                     "url": "/questions/{0}/{1}".format(post_id, sluggify(title))})
@@ -48,10 +49,12 @@ def serve(db, port):
     @route("/<post_id:int>")
     @route("/q/<post_id:int>")
     @route("/a/<post_id:int>")
-    @route("/p/<post_id:int>")
+    @route("/o/<post_id:int>")
+    @route("/posts/<post_id:int>")
+    @route("/posts/<post_id:int>")
     @route("/questions/<post_id:int>")
     @route("/questions/<post_id:int>/")
-    def to_post(post_id, slug=None, referrer=None):
+    def to_post(post_id):
         with db:
             cursor = db.cursor()
             cursor.execute("""
@@ -72,7 +75,7 @@ def serve(db, port):
             else:
                 return abort(404)
     
-    @route("/questions/<question_id:int>/<slug>")
+    @route("/questions/<question_id:int>/<slug:path>")
     @view("views/question")
     def question(question_id, slug=None):
         question = None
@@ -88,7 +91,7 @@ def serve(db, port):
             for post_id, title, body, score, views, parent, owner_id, owner_name, deletion, tags in cursor:
                 tags = re.findall("[A-Za-z0-9\-]+", tags) if tags else []
                 
-                body = re.sub("http://rads.stackoverflow.com/amzn/click/([^\"]+)", "http://www.amazon.com/dp/\\1?tag=whk5jwcq-20", body)
+                body = re.sub("http://rads.stackoverflow.com/amzn/click/([^\"]+)", "http://www.amazon.com/dp/\\1?" + AMAZON_TAG, body)
                 
                 this = {"post_id": post_id, "title": title, "body": body, "views": views, "score": score,
                         "owner_id": owner_id, "owner_name": owner_name, "deleted": deletion, "tags": tags}
@@ -115,13 +118,15 @@ def serve(db, port):
         }
     
     @route("/users/<user_id:int>/<slug>")
+    @route("/users/<user_id:int>/")
+    @route("/users/<user_id:int>")
     @route("/u/<user_id:int>")
     @view("views/user")
     def user(user_id, slug=None):
         pass
     
-    @route("/posts/<post_id:int>")
-    @view("views/post")
+    @route("/others/<post_id:int>")
+    @view("views/other")
     def post(post_id):
         pass
     
@@ -139,7 +144,7 @@ def kspan(n):
 
 def sluggify(title):
     slug = title or ""
-    slug = title.lower()
+    slug = slug.lower()
     slug = re.sub(r"[']", "", slug)
     slug = re.sub(r"[^a-zA-Z0-9]+", "-", slug)
     slug = re.sub(r"\-\-+", "-", slug)

@@ -15,13 +15,13 @@
     </div>
     
     <div class="attribution">
-      <a href="">asked</a> by <a href="http://stackoverflow.com/users/224/vzczc">Some User<img src="http://www.gravatar.com/avatar/1887903198095d29f1bb9624898e9bc5?s=32" /></a>  <br>
+      asked by <a href="http://stackoverflow.com/users/1318/jacobko">some other user<img src="http://www.gravatar.com/avatar/ffefefe?d=http://so.wut.ca/static/so-icon.png&amp;s=32" width="32" heigth="32" /></a>  <br>
       on August 15th, 2008<br>
       at 22:17 UTC
     </div>
     
     <div class="attribution">
-      edited by <a href="http://stackoverflow.com/users/224/vzczc">Some User<img src="http://www.gravatar.com/avatar/1887903198095d29f1bb9624898e9bc5?s=32" /></a>  <br>
+      edited by <a href="http://stackoverflow.com/users/1318/jacobko">some other user<img src="http://www.gravatar.com/avatar/ffefefe?d=http://so.wut.ca/static/so-icon.png&amp;s=32" width="32" heigth="32" /></a>  <br>
       on August 15th, 2008<br>
       at 22:17 UTC<br>
     </div>
@@ -38,7 +38,9 @@
     
     <div class="controls">
       <a href="/q/{{question["post_id"]}}">link</a> |
-      <a href="http://stackoverflow.com/q/{{question["post_id"]}}">original</a>
+      <a href="http://stackoverflow.com/q/{{question["post_id"]}}">original</a> |
+      <a href="#">show 5 comments</a> |
+      <a href="#">revisions</a>
     </div>
   </div>
   
@@ -65,7 +67,7 @@
     
     
       <div class="attribution">
-        <a href="#{{answer["post_id"]}}">answered</a> by <a href="http://stackoverflow.com/users/1318/jacobko">jacobko<img src="http://www.gravatar.com/avatar/86ed1705aaba3586de55f6a7690aabae?s=32" /></a>  <br>
+        answered by <a href="http://stackoverflow.com/users/1318/jacobko">some other user<img src="http://www.gravatar.com/avatar/ffefefe?d=http://so.wut.ca/static/so-icon.png&amp;s=32" width="32" heigth="32" /></a> (search)  <br>
         on August 15, 2008<br>
         at 22:22 UTC<br>
       </div>
@@ -81,4 +83,4 @@
   </div>
 % end
 
-%rebase page title=question["title"] + " - so.wut.ca mirror", canonical=canonical
+%rebase page title=question["title"], canonical=canonical, active="questions", active_id=question["post_id"]
