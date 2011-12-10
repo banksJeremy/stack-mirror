@@ -68,3 +68,32 @@ Being forced to link to the user's original profile is irritating.
 
 
 Add a generic link-rewriting mechanism. Use this to rewrite Amazon links, but also to redirect any intra-SO links that we can handle ourselves.
+
+
+
+
+
+
+    
+SELECT
+    post.Id,
+    type.Name as TypeName,
+    post.Body,
+    post.Title,
+    creator.Id as CreatorId,
+    (case when creator.DisplayName is not NULL then creator.DisplayName else post.OwnerDisplayName end) as CreatorName,
+    editor.Id as EditorId,
+    (case when editor.DisplayName is not NULL then editor.DisplayName else editor.OwnerDisplayName end) as EditorName
+    post.AcceptedAnswerId,
+    post.ParentId,
+    post.Tags as RawTags,
+    
+    post.DeletionSnapshotName,
+    
+FROM Posts post, Users user
+WHERE condition
+
+"""
+    
+
+
